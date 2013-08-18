@@ -9,10 +9,10 @@ __base__ = {
     'author':'giles hall',
     'author_email':'ghall@csh.rit.edu',
     'package_dir':{'midi':'src'},
-    'py_modules':['midi.containers', 'midi.__init__', 'midi.events', 'midi.util', 'midi.fileio', 'midi.constants'],
+    'py_modules':['midi.containers', 'midi.__init__', 'midi.events', 'midi.util', 'midi.fileio', 'midi.constants', 'midi.sequencer'],
     'ext_modules':[],
     'ext_package':'',
-    'scripts':['scripts/mididump', 'scripts/mididumphw', 'scripts/midiplay'],
+    'scripts':['scripts/mididump', 'scripts/mididumphw', 'scripts/midiplay', 'scripts/midilisten'],
 }
 
 def setup_alsa(ns):

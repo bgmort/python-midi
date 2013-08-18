@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+
+import sys
+import time
+import midi
+import midi.sequencer as sequencer
+
+#handle interrupts
+import signal
+
+
+
+if len(sys.argv) != 4:
+    print "Usage: {0} <client> <port> <filename>".format(sys.argv[0])
+    exit(2)
+
+client   = sys.argv[1]
+port     = sys.argv[2]
+filename = sys.argv[3]
+
+midi_in = sequencer.SequencerRead()
+midi_in.subscribe_port(client, port)
+#begin listening
+midi_in.start_sequencer()
+
+track = midi.Track([]);
+refTrack = midi.Track([midi.TimeSignatureEvent(tick=0, data=[4, 2, 24, 8]),
+    midi.KeySignatureEvent(tick=0, data=[0, 0]),
+    midi.EndOfTrackEvent(tick=1, data=[])]);
+song = midi.Pattern(tracks=[refTrack, track], resolution=midi_in.sequencer_resolution)
+
+interrupt = False
+
+#def signal_handler(signal, frame):
+#    print "interrupt recieved"
+#    interrupt = True
+
+#signal.signal(signal.SIGINT, signal_handler)
+print 'Press Ctrl+C to stop recording'
+
+while not interrupt:
+    try:
+        event = midi_in.event_read()
+    except (KeyboardInterrupt) as e:
+        print e
+        interrupt = True
+    else:
+        if event is not None:
+            print event
+            track.append(event)
+
+#after interrupt
+print ('writing file to %s' % filename)
+song.make_ticks_rel()
+track.append(midi.EndOfTrackEvent(tick=1, data=[]))
+
+midi.write_midifile(filename, song)
+print 'success'
